@@ -1,165 +1,160 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Music Player</title>
-
-<style>
-body{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  background:linear-gradient(135deg,#1e3c72,#2a5298);
-  font-family:Arial;
-  color:white;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basic Calculator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  margin: 0;
 }
 
-.player{
-  width:320px;
-  background:rgba(0,0,0,0.35);
-  padding:20px;
-  border-radius:15px;
-  text-align:center;
+.calculator {
+  background: #1e1e2f;
+  padding: 20px;
+  border-radius: 16px;
+  width: 320px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
 }
 
-h2{margin:5px 0;}
-p{margin:5px 0;color:#ccc;}
-
-.controls button{
-  background:#2ecc71;
-  border:none;
-  color:white;
-  font-size:18px;
-  padding:12px;
-  margin:10px;
-  border-radius:50%;
-  cursor:pointer;
+.display {
+  width: 100%;
+  height: 60px;
+  background: #111;
+  color: #00ffcc;
+  font-size: 28px;
+  border: none;
+  border-radius: 10px;
+  text-align: right;
+  padding: 10px;
+  margin-bottom: 15px;
 }
 
-.controls button:hover{
-  background:#27ae60;
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
 }
 
-input[type=range]{
-  width:100%;
-  margin:10px 0;
+button {
+  height: 55px;
+  font-size: 20px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #2c2c44;
+  color: #fff;
+  transition: all 0.2s ease;
 }
 
-.playlist{
-  text-align:left;
-  margin-top:10px;
+button:hover {
+  background: #3e3e5e;
+  transform: scale(1.05);
 }
 
-.playlist div{
-  padding:6px;
-  cursor:pointer;
-  border-bottom:1px solid #555;
+button.operator {
+  background: #ff8c00;
+  color: #000;
 }
 
-.playlist div:hover{
-  background:#444;
+button.operator:hover {
+  background: #ffa733;
 }
-</style>
+
+button.equal {
+  grid-column: span 2;
+  background: #00ffcc;
+  color: #000;
+  font-weight: bold;
+}
+
+button.equal:hover {
+  background: #33ffd6;
+}
+
+button.clear {
+  background: #ff4d4d;
+  color: #fff;
+}
+
+button.clear:hover {
+  background: #ff6666;
+}
+
+  </style>
 </head>
+<body>  <div class="calculator">
+    <input type="text" id="display" class="display" disabled /><div class="buttons">
+  <button class="clear" onclick="clearDisplay()">C</button>
+  <button onclick="deleteLast()">⌫</button>
+  <button class="operator" onclick="appendValue('/')">÷</button>
+  <button class="operator" onclick="appendValue('*')">×</button>
 
-<body>
+  <button onclick="appendValue('7')">7</button>
+  <button onclick="appendValue('8')">8</button>
+  <button onclick="appendValue('9')">9</button>
+  <button class="operator" onclick="appendValue('-')">−</button>
 
-<div class="player">
-  <h2 id="title">Dreams</h2>
-  <p id="artist">Artist One</p>
+  <button onclick="appendValue('4')">4</button>
+  <button onclick="appendValue('5')">5</button>
+  <button onclick="appendValue('6')">6</button>
+  <button class="operator" onclick="appendValue('+')">+</button>
 
-  <input type="range" id="progress" value="0">
+  <button onclick="appendValue('1')">1</button>
+  <button onclick="appendValue('2')">2</button>
+  <button onclick="appendValue('3')">3</button>
+  <button class="equal" onclick="calculateResult()">=</button>
 
-  <div class="controls">
-    <button onclick="prevSong()">⏮</button>
-    <button onclick="togglePlay()" id="playBtn">▶</button>
-    <button onclick="nextSong()">⏭</button>
-  </div>
-
-  <input type="range" min="0" max="1" step="0.01" value="1" onchange="setVolume(this.value)">
-
-  <div class="playlist">
-    <div onclick="loadSong(0)">Dreams - Artist One</div>
-    <div onclick="loadSong(1)">Journey - Artist Two</div>
-    <div onclick="loadSong(2)">Freedom - Artist Three</div>
-  </div>
+  <button onclick="appendValue('0')">0</button>
+  <button onclick="appendValue('.')">.</button>
 </div>
 
-<audio id="audio"></audio>
+  </div>  <script>
+    const display = document.getElementById('display');
 
-<script>
-const songs = [
-  {
-    title:"Dreams",
-    artist:"Artist One",
-    src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-  },
-  {
-    title:"Journey",
-    artist:"Artist Two",
-    src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-  },
-  {
-    title:"Freedom",
-    artist:"Artist Three",
-    src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
-  }
-];
+    function appendValue(value) {
+      display.value += value;
+    }
 
-let current = 0;
-const audio = document.getElementById("audio");
-const playBtn = document.getElementById("playBtn");
-const progress = document.getElementById("progress");
+    function clearDisplay() {
+      display.value = '';
+    }
 
-loadSong(current);
+    function deleteLast() {
+      display.value = display.value.slice(0, -1);
+    }
 
-function loadSong(index){
-  current = index;
-  audio.src = songs[index].src;
-  document.getElementById("title").textContent = songs[index].title;
-  document.getElementById("artist").textContent = songs[index].artist;
-  playSong();
-}
+    function calculateResult() {
+      try {
+        display.value = eval(display.value);
+      } catch (error) {
+        display.value = 'Error';
+      }
+    }
 
-function playSong(){
-  audio.play();
-  playBtn.textContent = "⏸";
-}
+    // Keyboard Support
+    document.addEventListener('keydown', function (event) {
+      const key = event.key;
 
-function pauseSong(){
-  audio.pause();
-  playBtn.textContent = "▶";
-}
-
-function togglePlay(){
-  audio.paused ? playSong() : pauseSong();
-}
-
-function nextSong(){
-  current = (current + 1) % songs.length;
-  loadSong(current);
-}
-
-function prevSong(){
-  current = (current - 1 + songs.length) % songs.length;
-  loadSong(current);
-}
-
-audio.addEventListener("timeupdate", ()=>{
-  progress.value = (audio.currentTime / audio.duration) * 100 || 0;
-});
-
-progress.addEventListener("input", ()=>{
-  audio.currentTime = (progress.value / 100) * audio.duration;
-});
-
-function setVolume(val){
-  audio.volume = val;
-}
-
-audio.addEventListener("ended", nextSong);
-</script>
-
-</body>
+      if (!isNaN(key) || key === '.') {
+        appendValue(key);
+      } else if (['+', '-', '*', '/'].includes(key)) {
+        appendValue(key);
+      } else if (key === 'Enter' || key === '=') {
+        event.preventDefault();
+        calculateResult();
+      } else if (key === 'Backspace') {
+        deleteLast();
+      } else if (key.toLowerCase() === 'c') {
+        clearDisplay();
+      }
+    });
+  </script></body>
 </html>
