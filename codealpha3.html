@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Music Player</title>
+
+<style>
+body{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  background:linear-gradient(135deg,#1e3c72,#2a5298);
+  font-family:Arial;
+  color:white;
+}
+
+.player{
+  width:320px;
+  background:rgba(0,0,0,0.35);
+  padding:20px;
+  border-radius:15px;
+  text-align:center;
+}
+
+h2{margin:5px 0;}
+p{margin:5px 0;color:#ccc;}
+
+.controls button{
+  background:#2ecc71;
+  border:none;
+  color:white;
+  font-size:18px;
+  padding:12px;
+  margin:10px;
+  border-radius:50%;
+  cursor:pointer;
+}
+
+.controls button:hover{
+  background:#27ae60;
+}
+
+input[type=range]{
+  width:100%;
+  margin:10px 0;
+}
+
+.playlist{
+  text-align:left;
+  margin-top:10px;
+}
+
+.playlist div{
+  padding:6px;
+  cursor:pointer;
+  border-bottom:1px solid #555;
+}
+
+.playlist div:hover{
+  background:#444;
+}
+</style>
+</head>
+
+<body>
+
+<div class="player">
+  <h2 id="title">Dreams</h2>
+  <p id="artist">Artist One</p>
+
+  <input type="range" id="progress" value="0">
+
+  <div class="controls">
+    <button onclick="prevSong()">⏮</button>
+    <button onclick="togglePlay()" id="playBtn">▶</button>
+    <button onclick="nextSong()">⏭</button>
+  </div>
+
+  <input type="range" min="0" max="1" step="0.01" value="1" onchange="setVolume(this.value)">
+
+  <div class="playlist">
+    <div onclick="loadSong(0)">Dreams - Artist One</div>
+    <div onclick="loadSong(1)">Journey - Artist Two</div>
+    <div onclick="loadSong(2)">Freedom - Artist Three</div>
+  </div>
+</div>
+
+<audio id="audio"></audio>
+
+<script>
+const songs = [
+  {
+    title:"Dreams",
+    artist:"Artist One",
+    src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+  },
+  {
+    title:"Journey",
+    artist:"Artist Two",
+    src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+  },
+  {
+    title:"Freedom",
+    artist:"Artist Three",
+    src:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+  }
+];
+
+let current = 0;
+const audio = document.getElementById("audio");
+const playBtn = document.getElementById("playBtn");
+const progress = document.getElementById("progress");
+
+loadSong(current);
+
+function loadSong(index){
+  current = index;
+  audio.src = songs[index].src;
+  document.getElementById("title").textContent = songs[index].title;
+  document.getElementById("artist").textContent = songs[index].artist;
+  playSong();
+}
+
+function playSong(){
+  audio.play();
+  playBtn.textContent = "⏸";
+}
+
+function pauseSong(){
+  audio.pause();
+  playBtn.textContent = "▶";
+}
+
+function togglePlay(){
+  audio.paused ? playSong() : pauseSong();
+}
+
+function nextSong(){
+  current = (current + 1) % songs.length;
+  loadSong(current);
+}
+
+function prevSong(){
+  current = (current - 1 + songs.length) % songs.length;
+  loadSong(current);
+}
+
+audio.addEventListener("timeupdate", ()=>{
+  progress.value = (audio.currentTime / audio.duration) * 100 || 0;
+});
+
+progress.addEventListener("input", ()=>{
+  audio.currentTime = (progress.value / 100) * audio.duration;
+});
+
+function setVolume(val){
+  audio.volume = val;
+}
+
+audio.addEventListener("ended", nextSong);
+</script>
+
+</body>
+</html>
